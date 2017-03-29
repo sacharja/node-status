@@ -205,7 +205,8 @@ const generateBar = (withPattern) => {
     switch (tokens[0]) {
       case 'timestamp':
       case 'uptime':
-        portion = bettertime(process.uptime(), true);
+        var outputType = modifier || 'bettertime';
+        portion = time[outputType](process.uptime(), true);
         break;
       case 'spinner':
         var spinnerType = modifier || 'dots';
@@ -222,23 +223,24 @@ const generateBar = (withPattern) => {
 //
 // Currently just changes the milliseconds to either a number of seconds or number of minutes
 //
-var nicetime = (ms, use_seconds) => {
-  var seconds = (ms / (use_seconds ? 1 : 1000)).toFixed((use_seconds ? 0 : 3));
-  var minutes = (seconds / 60).toFixed(3);
-  var time = (minutes < 2) ? seconds : minutes;
-  return time + (minutes < 2 ?  's' : 'm');
-};
-
-var bettertime = (ms, use_seconds) => {
-  var totalSeconds = ms.toFixed(0);
-  var seconds = totalSeconds % 60;
-  var minutes = Math.floor(totalSeconds / 60);
-  seconds = totalSeconds < 60 ? totalSeconds : seconds;
-  seconds = seconds < 10 ? '0' + seconds : seconds;
-  minutes = minutes < 10 ? '0' + minutes : minutes;
-  var time = minutes + 'm' + ' ' + seconds + 's';
-  return time;
-};
+var time = {
+  nicetime: function (ms, use_seconds) {
+    var seconds = (ms / (use_seconds ? 1 : 1000)).toFixed((use_seconds ? 0 : 3));
+    var minutes = (seconds / 60).toFixed(3);
+    var time = (minutes < 2) ? seconds : minutes;
+    return time + (minutes < 2 ?  's' : 'm');
+  },
+  bettertime: function (ms, use_seconds) {
+    var totalSeconds = ms.toFixed(0);
+    var seconds = totalSeconds % 60;
+    var minutes = Math.floor(totalSeconds / 60);
+    seconds = totalSeconds < 60 ? totalSeconds : seconds;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var time = minutes + 'm' + ' ' + seconds + 's';
+    return time;
+  }
+}
 
 process.on('exit', function () {
   if(running) stamp();
